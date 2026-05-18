@@ -1,2 +1,2 @@
-# bolsosenhasv1
-gerenciar senhas por q sou autista
+# bolsosenhas
+gerenciar senhas pq sou autista
