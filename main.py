@@ -25,11 +25,6 @@ def carregar_senhas(caminho_arquivo):
             senhas.append(linha)
         return senhas
     
-def consultar_senhas(caminho_arquivo):
-    resultado = carregar_senhas(caminho_arquivo)
-    for linha in resultado:
-        print(f"Plataforma: {linha[0]} | Senha: {linha[1]}")
-
 def trocar_senha(caminho_arquivo, plataforma):
     senhas = carregar_senhas(caminho_arquivo)
     encontrado = False
