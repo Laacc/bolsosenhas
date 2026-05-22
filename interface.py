@@ -59,7 +59,7 @@ class JanelaPrincipal(CTk):
 
     def trocar_senha(self):
         dialogo = CTkInputDialog(title="Alterar senha", text="Plataforma a alterar: ")
-        plataforma = dialogo.get_input().lower()
+        plataforma = dialogo.get_input()
         if plataforma != None and plataforma != "":
             alterada = self.gerenciador.trocar_senha(plataforma=plataforma)
             if alterada == True:
@@ -75,7 +75,7 @@ class JanelaPrincipal(CTk):
         
     def deletar_senha(self):
         dialogo = CTkInputDialog(title="Deletar senha", text="Plataforma para deletar: ")
-        plataforma = dialogo.get_input().lower()
+        plataforma = dialogo.get_input()
         if plataforma != None and plataforma != "":
             deletada = self.gerenciador.deletar_senha(plataforma=plataforma)
             if deletada == True:
@@ -94,7 +94,7 @@ class JanelaConsulta(CTkToplevel):
         super().__init__(master)
         self.gerenciador = gerenciador
         self.title("Consultar Senhas")
-        self.geometry("400x400")
+        self.geometry("500x400")
         self.lift()
         self.grab_set()
         self.grid_rowconfigure(0, weight=1)
@@ -103,11 +103,27 @@ class JanelaConsulta(CTkToplevel):
         barra_scroll.pack(fill="both", expand=True)
         lista_senhas = self.gerenciador.carregar_senhas()
         lista_botoes = []
+        self.icon_copiar = os.path.join("imgs", "copy-alt.png")
+        self.icon_mudar = os.path.join("imgs", "rotate-square.png")
+        self.icon_deletar = os.path.join("imgs", "trash.png")
+        self.icon_copiar_pil = Image.open(self.icon_copiar)
+        self.icon_mudar_pil = Image.open(self.icon_mudar) 
+        self.icon_deletar_pil = Image.open(self.icon_deletar)
+        self.icon_copiar_ctk = CTkImage(light_image=self.icon_copiar_pil, dark_image=self.icon_copiar_pil, size=(15, 15))
+        self.icon_mudar_ctk = CTkImage(light_image=self.icon_mudar_pil, dark_image=self.icon_mudar_pil, size=(15, 15))
+        self.icon_deletar_ctk = CTkImage(light_image=self.icon_deletar_pil, dark_image=self.icon_deletar_pil, size=(15, 15))
+        
         for item in lista_senhas:
             senha = CTkFrame(master=barra_scroll)
             label_nm = CTkLabel(master=senha, text=f"{item[0]}:", width=60, anchor="w")
-            lista_botoes.append(CTkButton(master=senha, text="********", fg_color="transparent", hover_color="#2B2B2B"))
+            lista_botoes.append(CTkButton(master=senha, text="********", fg_color="transparent", hover_color="#2B2B2B", width=60, height=60))
             lista_botoes[-1].configure(command=lambda b=lista_botoes[-1], s=item[-1]: self.visibilidade(b, s))
+            ctrl_c = CTkButton(master=senha, image=self.icon_copiar_ctk, text="", command=lambda s=item[-1]: self.copiar_senha(s), fg_color="transparent", hover_color="#2B2B2B", width=32, height=32)
+            delete = CTkButton(master=senha, image=self.icon_deletar_ctk, text="", command=lambda p=item[0]: self.deletar_clique(p), fg_color="transparent", hover_color="#2B2B2B", width=32, height=32)
+            alterar = CTkButton(master=senha, image=self.icon_mudar_ctk, text="", command=lambda p=item[0]: self.alterar_clique(p), fg_color="transparent", hover_color="#2B2B2B", width=32, height=32)
+            alterar.pack(side="left", padx=10)
+            delete.pack(side="left", padx=10)
+            ctrl_c.pack(side="left", padx=10)
             senha.pack(fill="x", pady=5)
             label_nm.pack(side="left", padx=10)
             lista_botoes[-1].pack(side="left", padx=10)
@@ -116,4 +132,18 @@ class JanelaConsulta(CTkToplevel):
         if botao.cget("text") == "********":
             botao.configure(text=senha_real)
         else:
-            botao.configure(text="********")    
+            botao.configure(text="********")
+
+    def copiar_senha(self, senha_real):
+        self.clipboard_clear()
+        self.clipboard_append(senha_real)
+    
+    def deletar_clique(self, plataforma):
+        self.gerenciador.deletar_senha(plataforma)
+        self.master.consultar_senhas()
+        self.destroy()
+
+    def alterar_clique(self, plataforma):
+        self.gerenciador.trocar_senha(plataforma)
+        self.master.consultar_senhas()
+        self.destroy()
