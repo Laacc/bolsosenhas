@@ -53,9 +53,9 @@ class JanelaPrincipal(CTk):
                 return   
             CTkMessagebox(title="Operação cancelada", message="A Operação foi cancelada!")
             return
-        
+    
     def consultar_senhas(self):
-        os.startfile(self.gerenciador.arquivo)
+        janela_consulta = JanelaConsulta(master=self, gerenciador=self.gerenciador)
 
     def trocar_senha(self):
         dialogo = CTkInputDialog(title="Alterar senha", text="Plataforma a alterar: ")
@@ -88,3 +88,32 @@ class JanelaPrincipal(CTk):
                 return
             CTkMessagebox(title="Operação cancelada", message="A Operação foi cancelada!")
             return
+
+class JanelaConsulta(CTkToplevel):
+    def __init__(self, master, gerenciador):
+        super().__init__(master)
+        self.gerenciador = gerenciador
+        self.title("Consultar Senhas")
+        self.geometry("400x400")
+        self.lift()
+        self.grab_set()
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        barra_scroll = CTkScrollableFrame(self, width=200, height=200)
+        barra_scroll.pack(fill="both", expand=True)
+        lista_senhas = self.gerenciador.carregar_senhas()
+        lista_botoes = []
+        for item in lista_senhas:
+            senha = CTkFrame(master=barra_scroll)
+            label_nm = CTkLabel(master=senha, text=f"{item[0]}:", width=60, anchor="w")
+            lista_botoes.append(CTkButton(master=senha, text="********", fg_color="transparent", hover_color="#2B2B2B"))
+            lista_botoes[-1].configure(command=lambda b=lista_botoes[-1], s=item[-1]: self.visibilidade(b, s))
+            senha.pack(fill="x", pady=5)
+            label_nm.pack(side="left", padx=10)
+            lista_botoes[-1].pack(side="left", padx=10)
+
+    def visibilidade(self, botao, senha_real):
+        if botao.cget("text") == "********":
+            botao.configure(text=senha_real)
+        else:
+            botao.configure(text="********")    

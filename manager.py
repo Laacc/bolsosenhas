@@ -20,7 +20,7 @@ class GerenciadorSenhas:
         with open(self.arquivo, "r", encoding="utf-8") as a:
             senhas = []
             for linha in a:
-                linha = linha.strip().split(";")
+                linha = linha.strip().split(";",1)
                 senhas.append(linha)
             return senhas
         
