@@ -7,8 +7,7 @@ from manager import GerenciadorSenhas
 class JanelaPrincipal(CTk):
     def __init__(self):
         super().__init__()
-        caminho_pasta = os.path.join("data", "data.txt")
-        self.gerenciador = GerenciadorSenhas(caminho_pasta)
+        self.gerenciador = GerenciadorSenhas()
         self.title("Bolsosenhas")
         self.geometry("500x500")
         self.resizable(False, False)
