@@ -1,52 +1,58 @@
 import random
 import string
+import sqlite3
 
 class GerenciadorSenhas:
-    def __init__(self, arquivo):
-        self.arquivo = arquivo
-        with open(self.arquivo, "a", encoding="utf-8") as a:
-            pass
-
-    def gerar_senha(self, tamanho=24):
+    def __init__(self, caminho):
+        self.caminho = caminho
+        with sqlite3.connect(self.caminho) as con:
+            cursor = con.cursor()
+            cursor.execute("CREATE TABLE IF NOT EXISTS senhas ("
+                           "id INTEGER PRIMARY KEY," \
+                           "plataforma TEXT," \
+                           "senha TEXT)")
+            con.commit()
+            
+    def gerar_senha(self, tamanho=16):
         caracteres = string.ascii_letters + string.digits + string.punctuation
         senha = "".join(random.choices(caracteres, k=tamanho))
         return senha
     
     def salvar_senha(self, plataforma, senha):
-        with open(self.arquivo, "a", encoding="utf-8") as a:
-            a.write(f"{plataforma};{senha}\n")
+        nova_senha = ((plataforma, senha))
+        with sqlite3.connect(self.caminho) as con:
+            cursor = con.cursor()
+            cursor.execute("INSERT INTO senhas (plataforma, senha) VALUES (?, ?)", nova_senha)
+            con.commit()
 
     def carregar_senhas(self):
-        with open(self.arquivo, "r", encoding="utf-8") as a:
+        with sqlite3.connect(self.caminho) as con:
             senhas = []
-            for linha in a:
-                linha = linha.strip().split(";",1)
+            cursor = con.cursor()
+            cursor.execute("SELECT * FROM senhas ORDER BY id, plataforma")
+            fetch = cursor.fetchall()
+            for linha in fetch:
                 senhas.append(linha)
             return senhas
-        
+
     def trocar_senha(self, plataforma):
-        senhas = self.carregar_senhas()
-        encontrado = False
-        for linha in senhas:
-            if linha[0] == plataforma:
-                encontrado = True
-                nova_senha = self.gerar_senha()
-                linha[1] = nova_senha
-                break
-        with open(self.arquivo, "w", encoding="utf-8") as a:
-            for linha in senhas:
-                a.write(f"{linha[0]};{linha[1]}\n")
-        return encontrado
-    
+        senha = self.gerar_senha()
+        nova_senha = ((senha, plataforma))
+        with sqlite3.connect(self.caminho) as con:
+            cursor = con.cursor()
+            cursor.execute("UPDATE senhas SET senha=(?) WHERE plataforma=(?)", nova_senha)
+            row_bool = cursor.rowcount
+            con.commit()
+            if row_bool == 1:
+                return True
+            else:
+                return False
+            
     def deletar_senha(self, plataforma):
-        senhas = self.carregar_senhas()
-        encontrado = False
-        for linha in senhas:
-            if linha[0] == plataforma:
-                encontrado = True
-                senhas.remove(linha)
-                break
-        with open(self.arquivo, "w", encoding="utf-8") as a:
-            for linha in senhas:
-                a.write(f"{linha[0]};{linha[1]}\n")
-        return encontrado
+        plataforma_busca = ((plataforma,))
+        with sqlite3.connect(self.caminho) as con:
+            cursor = con.cursor()
+            cursor.execute("DELETE FROM senhas WHERE plataforma=(?)", plataforma_busca)
+            row_bool = cursor.rowcount
+            con.commit()
+            return row_bool == 1

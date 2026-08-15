@@ -7,7 +7,7 @@ from manager import GerenciadorSenhas
 class JanelaPrincipal(CTk):
     def __init__(self):
         super().__init__()
-        caminho_pasta = os.path.join("data", "data.txt")
+        caminho_pasta = os.path.join("data", "data.db")
         self.gerenciador = GerenciadorSenhas(caminho_pasta)
         self.title("Bolsosenhas")
         self.geometry("500x500")
@@ -115,12 +115,12 @@ class JanelaConsulta(CTkToplevel):
         
         for item in lista_senhas:
             senha = CTkFrame(master=barra_scroll)
-            label_nm = CTkLabel(master=senha, text=f"{item[0]}:", width=60, anchor="w")
+            label_nm = CTkLabel(master=senha, text=f"{item[0]} | {item[1]}", width=60, anchor="w")
             lista_botoes.append(CTkButton(master=senha, text="********", fg_color="transparent", hover_color="#2B2B2B", width=60, height=60))
             lista_botoes[-1].configure(command=lambda b=lista_botoes[-1], s=item[-1]: self.visibilidade(b, s))
             ctrl_c = CTkButton(master=senha, image=self.icon_copiar_ctk, text="", command=lambda s=item[-1]: self.copiar_senha(s), fg_color="transparent", hover_color="#2B2B2B", width=32, height=32)
-            delete = CTkButton(master=senha, image=self.icon_deletar_ctk, text="", command=lambda p=item[0]: self.deletar_clique(p), fg_color="transparent", hover_color="#2B2B2B", width=32, height=32)
-            alterar = CTkButton(master=senha, image=self.icon_mudar_ctk, text="", command=lambda p=item[0]: self.alterar_clique(p), fg_color="transparent", hover_color="#2B2B2B", width=32, height=32)
+            delete = CTkButton(master=senha, image=self.icon_deletar_ctk, text="", command=lambda p=item[1]: self.deletar_clique(p), fg_color="transparent", hover_color="#2B2B2B", width=32, height=32)
+            alterar = CTkButton(master=senha, image=self.icon_mudar_ctk, text="", command=lambda p=item[1]: self.alterar_clique(p), fg_color="transparent", hover_color="#2B2B2B", width=32, height=32)
             alterar.pack(side="left", padx=10)
             delete.pack(side="left", padx=10)
             ctrl_c.pack(side="left", padx=10)
