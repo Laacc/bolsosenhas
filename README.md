@@ -1,2 +1,2 @@
 # bolsosenhas
-gerenciar senhas pq sou autista
+gerenciador de senhas bem + ou -
